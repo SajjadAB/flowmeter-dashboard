@@ -141,7 +141,7 @@ ALL_UNITS = {
     "UNIT 3": {
         "tag": "RU33D010",
         "off": [
-            {"pct": 60,  "fixed": 9.2,   "variable": 7.75},
+            {"pct": 60,  "fixed": 6.55,   "variable": 7.05},
             {"pct": 40,  "fixed": 1.67,  "variable": 2.18},
             {"pct": 25,  "fixed": 0,     "variable": 1.2},
             {"pct": 50,  "fixed": 3.6,   "variable": 4.15},
