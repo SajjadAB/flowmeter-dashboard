@@ -117,35 +117,79 @@ hr { border-color: #30363d; }
 """, unsafe_allow_html=True)
 
 # ─── Data ───────────────────────────────────────────────────────────────────
-DATA_OFF = [
-    {"pct": 54,  "fixed": 4.35,  "variable": 3.57},
-    {"pct": 70,  "fixed": 7.78,  "variable": 8.02},
-    {"pct": 100, "fixed": 10.82, "variable": 10.77},
-    {"pct": 45,  "fixed": 2.05,  "variable": 2.15},
-    {"pct": 40,  "fixed": 0,     "variable": 1.32},
-]
-DATA_ON = [
-    {"pct": 100, "fixed": 86,    "variable": 82},
-    {"pct": 80,  "fixed": 73.3,  "variable": 68.29},
-    {"pct": 65,  "fixed": 46.61, "variable": 44.12},
-    {"pct": 54,  "fixed": 27.49, "variable": 26.86},
-    {"pct": 40,  "fixed": 8.81,  "variable": 9.24},
-    {"pct": 25,  "fixed": 4.47,  "variable": 5.16},
-    {"pct": 10,  "fixed": 2.02,  "variable": 2.92},
-    {"pct": 2,   "fixed": 1.91,  "variable": 2.88},
-]
+ALL_UNITS = {
+    "UNIT 2": {
+        "tag": "RU32D010",
+        "off": [
+            {"pct": 54,  "fixed": 4.35,  "variable": 3.57},
+            {"pct": 70,  "fixed": 7.78,  "variable": 8.02},
+            {"pct": 100, "fixed": 10.82, "variable": 10.77},
+            {"pct": 45,  "fixed": 2.05,  "variable": 2.15},
+            {"pct": 40,  "fixed": 0,     "variable": 1.32},
+        ],
+        "on": [
+            {"pct": 100, "fixed": 86,    "variable": 82},
+            {"pct": 80,  "fixed": 73.3,  "variable": 68.29},
+            {"pct": 65,  "fixed": 46.61, "variable": 44.12},
+            {"pct": 54,  "fixed": 27.49, "variable": 26.86},
+            {"pct": 40,  "fixed": 8.81,  "variable": 9.24},
+            {"pct": 25,  "fixed": 4.47,  "variable": 5.16},
+            {"pct": 10,  "fixed": 2.02,  "variable": 2.92},
+            {"pct": 2,   "fixed": 1.91,  "variable": 2.88},
+        ],
+    },
+    "UNIT 3": {
+        "tag": "RU33D010",
+        "off": [
+            {"pct": 60,  "fixed": 9.2,   "variable": 7.75},
+            {"pct": 40,  "fixed": 1.67,  "variable": 2.18},
+            {"pct": 25,  "fixed": 0,     "variable": 1.2},
+            {"pct": 50,  "fixed": 3.6,   "variable": 4.15},
+            {"pct": 70,  "fixed": 8.62,  "variable": 8.91},
+            {"pct": 80,  "fixed": 9.87,  "variable": 10.29},
+            {"pct": 90,  "fixed": 10.59, "variable": 10.98},
+            {"pct": 100, "fixed": 12.97, "variable": 12.67},
+        ],
+        "on": [
+            {"pct": 0,   "fixed": 2.8,   "variable": 2.83},
+            {"pct": 35,  "fixed": 9.35,  "variable": 8.76},
+            {"pct": 50,  "fixed": 21.77, "variable": 21.65},
+            {"pct": 70,  "fixed": 53.25, "variable": 52.38},
+            {"pct": 100, "fixed": 79.16, "variable": 76.47},
+        ],
+    },
+    "UNIT 4": {
+        "tag": "RU34D010",
+        "off": [
+            {"pct": 42,  "fixed": 0,     "variable": 0.33},
+            {"pct": 49,  "fixed": 1.82,  "variable": 0.78},
+            {"pct": 65,  "fixed": 4.76,  "variable": 5.15},
+            {"pct": 75,  "fixed": 6.84,  "variable": 7.07},
+            {"pct": 100, "fixed": 10.58, "variable": 10.33},
+        ],
+        "on": [
+            {"pct": 0,   "fixed": 0,     "variable": 0.02},
+            {"pct": 15,  "fixed": 2.02,  "variable": 2.37},
+            {"pct": 36,  "fixed": 5.72,  "variable": 6.03},
+            {"pct": 60,  "fixed": 23.91, "variable": 23.82},
+            {"pct": 70,  "fixed": 42.34, "variable": 41.72},
+            {"pct": 75,  "fixed": 50.25, "variable": 39.6},
+            {"pct": 80,  "fixed": 57.13, "variable": 56.82},
+            {"pct": 100, "fixed": 78.82, "variable": 77.43},
+        ],
+    },
+}
 
 @st.cache_data
-def load_data():
-    df_off = pd.DataFrame(DATA_OFF).sort_values("pct").reset_index(drop=True)
-    df_on  = pd.DataFrame(DATA_ON).sort_values("pct").reset_index(drop=True)
+def load_data(unit_name):
+    u = ALL_UNITS[unit_name]
+    df_off = pd.DataFrame(u["off"]).sort_values("pct").reset_index(drop=True)
+    df_on  = pd.DataFrame(u["on"]).sort_values("pct").reset_index(drop=True)
     df_off["diff"] = df_off["variable"] - df_off["fixed"]
     df_on["diff"]  = df_on["variable"]  - df_on["fixed"]
     df_off["state"] = "OFF"
     df_on["state"]  = "ON"
     return df_off, df_on
-
-df_off, df_on = load_data()
 
 # ─── Plotly theme ───────────────────────────────────────────────────────────
 LAYOUT_BASE = dict(
@@ -181,8 +225,9 @@ def compute_stats(df):
 with st.sidebar:
     st.markdown("## 💧 Flowmeter\nValidation")
     st.markdown("---")
-    st.markdown("**PROJECT**")
-    st.markdown("UNIT 2 · RU32D010")
+    st.markdown("**SELECT UNIT**")
+    selected_unit = st.radio("", list(ALL_UNITS.keys()), index=0,
+                             format_func=lambda x: f"⚡ {x}")
     st.markdown("---")
     pump_state = st.radio("Pump State", ["OFF", "ON", "Both"], index=2)
     st.markdown("---")
@@ -193,6 +238,9 @@ with st.sidebar:
     st.markdown("🟡 Portable Flowmeter")
     st.markdown("---")
     st.caption("Flowmeter Validation Dashboard v1.0")
+
+unit_tag = ALL_UNITS[selected_unit]["tag"]
+df_off, df_on = load_data(selected_unit)
 
 # select data based on pump state
 if pump_state == "OFF":
@@ -214,7 +262,7 @@ st.markdown(
           Flowmeter Validation Dashboard
         </span><br>
         <span style="font-size:13px;color:#8b949e;font-family:'IBM Plex Mono',monospace;">
-          UNIT 2 · RU32D010 · Control Valve Analysis
+          {selected_unit} · {unit_tag} · Control Valve Analysis
         </span>
       </div>
       <div>
