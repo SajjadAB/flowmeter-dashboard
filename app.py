@@ -173,14 +173,14 @@ ALL_UNITS = {
             {"pct": 36,  "fixed": 5.72,  "variable": 6.03},
             {"pct": 60,  "fixed": 23.91, "variable": 23.82},
             {"pct": 70,  "fixed": 42.34, "variable": 41.72},
-            {"pct": 75,  "fixed": 50.25, "variable": 49.6},
+            {"pct": 75,  "fixed": 50.25, "variable": 39.6},
             {"pct": 80,  "fixed": 57.13, "variable": 56.82},
             {"pct": 100, "fixed": 78.82, "variable": 77.43},
         ],
     },
 }
 
-@st.cache_data
+@st.cache_data(ttl=0)
 def load_data(unit_name):
     u = ALL_UNITS[unit_name]
     df_off = pd.DataFrame(u["off"]).sort_values("pct").reset_index(drop=True)
